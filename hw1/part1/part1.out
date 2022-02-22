@@ -1,0 +1,29 @@
+5.16.9-b103040012
+
+ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.107.128  netmask 255.255.255.0  broadcast 192.168.107.255
+        inet6 fe80::2df0:2451:d91b:3e7c  prefixlen 64  scopeid 0x20<link>
+        ether 00:0c:29:fb:3a:54  txqueuelen 1000  (Ethernet)
+        RX packets 121938  bytes 183501443 (183.5 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 19320  bytes 1228309 (1.2 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 295  bytes 29548 (29.5 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 295  bytes 29548 (29.5 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+
+PING 140.117.11.1 (140.117.11.1) 56(84) bytes of data.
+64 bytes from 140.117.11.1: icmp_seq=1 ttl=128 time=0.787 ms
+64 bytes from 140.117.11.1: icmp_seq=2 ttl=128 time=0.749 ms
+64 bytes from 140.117.11.1: icmp_seq=3 ttl=128 time=1.60 ms
+
+--- 140.117.11.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2054ms
+rtt min/avg/max/mdev = 0.749/1.045/1.601/0.392 ms
