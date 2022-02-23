@@ -53,7 +53,7 @@ B = 1
 C = 2
 D = 2
 ```
-[](https://i.imgur.com/Dfk3mvn.jpg)
+![](https://i.imgur.com/Dfk3mvn.jpg)
 we can only determine the value of A, B, C, D. any order can be possible.  
 * *however, by comparing the costing time, we can know the probaly order.  
 since P1 is after P fork() which is time-consuming, P1 will be probaly executed after that. but notice that P1 also fork() at first, so P2 will probaly be executed after that, and so on.  
