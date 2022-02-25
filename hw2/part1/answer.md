@@ -65,6 +65,7 @@ B = 1
 D = 2
 C = 2
 ```
-* *it's based on round-robin scheduling.  
-* *i test the code on my computer, and always get the order: A, B, C, D. maybe linux put parent and child process in different priority queue?
+- *it's based on round-robin scheduling.  
+- *i test the code on my computer, and always get the order: A, B, C, D. maybe linux put parent and child process in different priority?  
+2022/2/25 update: no, linux doesn't put parent and child process in different priority. if put some time-consuming instruction in a process, it might be executed later.  
 
