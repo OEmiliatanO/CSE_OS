@@ -1,0 +1,30 @@
+path = /bin/ls
+
+store in argv[]:
+ls
+-l
+path = /bin/ls
+
+store in argv[]:
+ls
+-la
+path = /bin/echo
+
+store in argv[]:
+echo
+"asdad"
+path = /bin/ls
+
+store in argv[]:
+ls
+..
+path = /bin/rm
+
+store in argv[]:
+rm
+../test.cpp
+path = /bin/ls
+
+store in argv[]:
+ls
+..
