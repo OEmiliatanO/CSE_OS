@@ -1,8 +1,9 @@
-CC:=gcc
+CC:=g++
 
-all: shell.o
-	$(CC) -o shell shell.o
-dep: shell.c
-	$(CC) -c shell.c
+all: myshell.o parser.o
+	$(CC) -o myshell myshell.o parser.o
+dep: myshell.cpp parser.cpp
+	$(CC) -Wall -c myshell.cpp
+	$(CC) -Wall -c parser.cpp
 clean:
 	rm *.o
