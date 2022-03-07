@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "parser.h"
 
 int cntpipe(char *s, int len)
 {
@@ -14,14 +15,11 @@ int cntpipe(char *s, int len)
 	return res;
 }
 
-bool split(char *src, int& i, int n, char sp, char* des)
+int split(char *src, char sp, char* des)
 {
-	int p = 0;
-	for (; i < strlen(src); des[p++] = src[i], ++i)
-		if(src[i] == sp) break;
-	++i;
-	des[p++] = 0;
-	return i < n;
+	char format[100] = "%[^ ]s";
+	format[3] = sp;
+	return sscanf(src, format, des);
 }
 
 char** Cmdpar(char *raw_command, int& num)
@@ -44,10 +42,17 @@ char** Cmdpar(char *raw_command, int& num)
 
 		++idxOfcmds;
 	}
+	// ls -l | cat | sort | grep d
+	// after parser:
+	// [0]:ls -l
+	// [1]:cat
+	// [2]:sort
+	// [3]:grep d
+	// num = 4
 	return cmds;
 }
 
-
+/*
 int main()
 {
 	char *s = (char*)malloc(sizeof(char) * 1000);
@@ -60,4 +65,4 @@ int main()
 	free(s);
 	return 0;
 }
-
+*/
