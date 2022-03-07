@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <pwd.h>
 #include <fcntl.h>
 
 char** raw_command;
@@ -25,7 +27,17 @@ int predecide(char* rcommand)
 			path[strlen(path) + 1] = 0;
 			printf("now path = %s\n", path);
 		}
+		else if (*command == '~')
+		{
+			struct passwd *pw = getpwuid(getuid());
 
+			strcpy(path, pw->pw_dir);
+			int l = strlen(path);
+			path[l] = '/';
+			path[l + 1] = 0;
+			++command;
+		}
+		
 		strcat(path, command);
 
 		printf("going to %s\n", path);
