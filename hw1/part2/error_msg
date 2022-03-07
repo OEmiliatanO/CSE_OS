@@ -1,26 +1,27 @@
+path = /bin/vim
+
+store in argv[]:
+vim
+test.cpp
+path = /bin/:x
+
+store in argv[]:
+:x
+path = /bin/:q
+
+store in argv[]:
+:q
+= /bin/ls
+
+store in argv[]:
+ls
+-A
 path = /bin/ls
 
 store in argv[]:
 ls
--l
-path = /bin/ls
-
-store in argv[]:
-ls
--la
-path = /bin/echo
-
-store in argv[]:
-echo
-"asdad"
-path = /bin/ls
-
-store in argv[]:
-ls
-..
-path = /bin/rm
-
-store in argv[]:
+-lA
+gv[]:
 rm
 ../test.cpp
 path = /bin/ls

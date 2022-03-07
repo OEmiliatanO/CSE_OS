@@ -2,6 +2,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 char raw_command[1000];
 
@@ -18,6 +19,10 @@ char* cat(char *s1, char *s2)
 
 int main()
 {
+	int fd = open("error_msg", O_WRONLY);
+	dup2(fd, STDERR_FILENO);
+	//std::cerr << "debug" << '\n';
+
 	while(true)
 	{
 		char* argv[1000]{};
