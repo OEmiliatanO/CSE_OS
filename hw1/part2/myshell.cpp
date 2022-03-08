@@ -14,6 +14,14 @@ char* raw_command;
 int cmdcnt;
 char** cmds;
 
+// deal with "cd", "ll", "la",... and the path such that "~/"
+void preprocess(char* rcmd){
+
+}
+
+// fork the child based on the pipe order (tail to head),
+// this function also deals with the redirection.
+// notice, this function will cause the unreversed changing on cmds[i] string.
 void execute(char** cmds, int n)
 {
 	int status;
@@ -54,71 +62,56 @@ void execute(char** cmds, int n)
 		}
 		else
 		{
+			fprintf(stderr, "pipeline error\n");
+			exit(0);
 		}
 	}
 
-	// take out the redirection argument
 	char buf[50]{};
 	char *cmd = cmds[exeidx];
-	char ***argv = (char***)malloc(sizeof(char**) * 2);
-	argv[0] = (char**)malloc(sizeof(char*) * 100);
-	argv[1] = (char**)malloc(sizeof(char*) * 100);
-
-	int p = 0, argc = 0, redic = 0;
+	
 	//printf("===============\n");
 	//printf("to exec: %s\n", cmd);
+	
+	// deal with the redirection first
+	char *src  = (char*)malloc(sizeof(char) * 100);
+	char *dest = (char*)malloc(sizeof(char) * 100);
 
-	while(~split(cmd + p, ' ', buf))
+	// the redirection part of the command will be cover with ' '
+	// e.g. "cat filein > fileout" -> "cat filein         "
+	if (getRedirFile(cmd, '<', src) <= 0 ) { free(src);  src  = nullptr; }
+	if (getRedirFile(cmd, '>', dest) <= 0) { free(dest); dest = nullptr; }
+
+	//printf("after erase the redirection section: %s", cmd);
+
+	// deal with the argument
+	char **argv = (char**)calloc(100, sizeof(char*));
+	int p = 0, argc = 0;
+	while(isspace(cmd[p])) ++p;
+	while(cmd[p] && ~split(cmd + p, ' ', buf))
 	{
 		int bufl = strlen(buf);
 		p += bufl;
 		while(isspace(cmd[p])) ++p;
-		bool flag = (strchr(buf, '>') || strchr(buf, '<'));
-
-		int& idx = (flag ? redic : argc);
 		
-		argv[flag][idx] = (char*)malloc(sizeof(char) * (bufl + 1));
-		memcpy(argv[flag][idx], buf, sizeof(char) * bufl);
-		argv[flag][idx][bufl] = 0;
-		++idx;
+		argv[argc] = (char*)malloc(sizeof(char) * (bufl + 1));
+		memcpy(argv[argc], buf, sizeof(char) * bufl);
+		argv[argc][bufl] = 0;
+		++argc;
 	}
-	argv[0][argc] = 0;
-	argv[1][redic] = 0;
+	argv[argc] = 0;
 
 	// redirection
-	// notice, the redirection of my shell must have no space between ">" and "dest", so as "<" and "src".
-	char *src = nullptr, *dest = nullptr;
-	for (int i = 0; i < redic; ++i)
-	{
-		char* ch = strchr(argv[1][i], '>');
-		int pos;
-		if (ch)
-		{
-			pos = ch - argv[1][i];
-			while(isspace(argv[1][i][pos]) || argv[1][i][pos] == '>') ++pos;
-			dest = (char*)malloc((strlen(argv[1][i]) - pos + 1) * sizeof(char));
-			memcpy(dest, argv[1][i] + pos, strlen(argv[1][i]) - pos);
-			dest[strlen(argv[1][i]) - pos] = 0;
-		}
-		else
-		{
-			pos = strchr(argv[1][i], '<') - argv[1][i];
-			while(isspace(argv[1][i][pos]) || argv[1][i][pos] == '<') ++pos;
-			src = (char*)malloc((strlen(argv[1][i]) - pos + 1) * sizeof(char));
-			memcpy(src, argv[1][i] + pos, strlen(argv[1][i]) - pos);
-			src[strlen(argv[1][i]) - pos] = 0;
-		}
-	}
 	if (src != nullptr)
 	{
 		//printf("src = %s\n", src);
-		FILE *in = (src != nullptr ? fopen(src, "r") : stdin);
+		FILE *in = fopen(src, "r");
 		dup2(fileno(in), STDIN_FILENO);
 	}
 	if (dest != nullptr)
 	{
 		//printf("dest = %s\n", dest);
-		FILE *out = (dest != nullptr ? fopen(dest, "w") : stdout);
+		FILE *out = fopen(dest, "w");
 		dup2(fileno(out), STDOUT_FILENO);
 	}
 	/*
@@ -127,28 +120,14 @@ void execute(char** cmds, int n)
 	{
 		printf("argv[%d]=%s\n", i, argv[0][i]);
 	}
-	printf("\nredirection section:\n");
-	for (int i = 0; i < redic; ++i)
-	{
-		printf("redirection[%d]=%s\n", i, argv[1][i]);
-	}
 	printf("==============\n");
 	*/
-	
-	/*
-	for (int i = 0; i < argc; ++i)
-	{
-		printf("argv[%d]:%s\n", i, argv[0][i]);
-	}
-	*/
 
-	if (execvp(argv[0][0], argv[0]) < 0)
-		puts("command not found");
+	if (execvp(argv[0], argv) < 0)
+		puts("myshell: Command not found");
 
 	// release memory
-	for (int i = 0; i < argc; ++i)	free(argv[0][i]);
-	for (int i = 0; i < redic; ++i) free(argv[1][i]);
-	free(argv[0]); free(argv[1]);
+	for (int i = 0; i < argc; ++i)	free(argv[i]);
 	free(argv);
 	free(src); free(dest);
 	argv = nullptr;
@@ -158,13 +137,6 @@ void execute(char** cmds, int n)
 
 int main()
 {
-	/*
-	char PATHinterpreter[1000]{};
-	getcwd(PATHinterpreter, sizeof(PATHinterpreter));
-	strcat(PATHinterpreter, "/interpreter");
-	printf("interpreter path = %s\n", PATHinterpreter);
-	*/
-
 	raw_command = (char*)malloc(sizeof(char) * 1000);
 	while(true)
 	{
