@@ -146,7 +146,16 @@ int main()
 		getchar();
 
 		cmds = Cmdpar(raw_command, cmdcnt);
-		execute(cmds, cmdcnt);
+		
+		pid_t pid = fork();
+		int status;
+		if (pid > 0)
+			waitpid(pid, &status, 0);
+		else
+		{
+			execute(cmds, cmdcnt);
+			exit(0);
+		}
 
 		// release the space of cmds
 		for (int i = 0; i < cmdcnt; ++i)
