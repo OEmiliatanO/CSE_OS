@@ -22,6 +22,12 @@ int split(char *src, char sp, char* des)
 	return sscanf(src, format, des);
 }
 
+int strip(char *src, char *des)
+{
+	while(*src && isspace(*src)) ++src;
+	return sscanf(src, "%[^\0]s", des);
+}
+
 char** Cmdpar(char *raw_command, int& num)
 {
 	int lenOfrcmd = strlen(raw_command);

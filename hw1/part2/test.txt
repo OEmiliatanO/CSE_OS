@@ -1,9 +1,0 @@
-container
-makefile
-myshell
-myshell.cpp
-myshell.o
-parser.cpp
-parser.h
-parser.o
-test.txt

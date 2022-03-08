@@ -11,7 +11,8 @@
 
 int cntpipe(char *s, int len);
 
-int split(char *src, char sp, char* des);
+int split(char *src, char sp, char *des);
+int strip(char *src, char *des);
 
 char** Cmdpar(char *raw_command, int& num);
 
