@@ -15,11 +15,24 @@ int cntpipe(char *s, int len)
 	return res;
 }
 
-int split(char *src, char sp, char* des)
+int split(char *src, char sp, char *des)
 {
 	char format[100] = "%[^ ]s";
 	format[3] = sp;
 	return sscanf(src, format, des);
+}
+
+int getRedirFile(char *src, char sp, char *des)
+{
+	char* p = strchr(src, sp);
+	
+	if (p) *(p++) = ' ';
+	else return 0;
+	
+	while(isspace(*p)) ++p;
+	int res = sscanf(p, "%[^ ]s", des);
+	while(*p && !isspace(*p)) *(p++) = ' ';
+	return res;
 }
 
 char** Cmdpar(char *raw_command, int& num)

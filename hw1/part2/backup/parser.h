@@ -11,7 +11,9 @@
 
 int cntpipe(char *s, int len);
 
-int split(char *src, char sp, char* des);
+int split(char *src, char sp, char *des);
+
+int getRedirFile(char *src, char sp, char *des);
 
 char** Cmdpar(char *raw_command, int& num);
 

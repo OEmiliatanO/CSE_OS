@@ -15,17 +15,24 @@ int cntpipe(char *s, int len)
 	return res;
 }
 
-int split(char *src, char sp, char* des)
+int split(char *src, char sp, char *des)
 {
 	char format[100] = "%[^ ]s";
 	format[3] = sp;
 	return sscanf(src, format, des);
 }
 
-int strip(char *src, char *des)
+int getRedirFile(char *src, char sp, char *des)
 {
-	while(*src && isspace(*src)) ++src;
-	return sscanf(src, "%[^\0]s", des);
+	char* p = strchr(src, sp);
+	
+	if (p) *(p++) = ' ';
+	else return 0;
+	
+	while(isspace(*p)) ++p;
+	int res = sscanf(p, "%[^ ]s", des);
+	while(*p && !isspace(*p)) *(p++) = ' ';
+	return res;
 }
 
 char** Cmdpar(char *raw_command, int& num)
@@ -57,18 +64,3 @@ char** Cmdpar(char *raw_command, int& num)
 	// num = 4
 	return cmds;
 }
-
-/*
-int main()
-{
-	char *s = (char*)malloc(sizeof(char) * 1000);
-	while(~scanf("%[^\n]s", s) && getchar())
-	{
-		int num;
-		Cmdpar(s, num);
-		printf("%d\n", num);
-	}
-	free(s);
-	return 0;
-}
-*/
