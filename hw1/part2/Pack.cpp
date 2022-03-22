@@ -15,7 +15,6 @@ int cmdcnt;
 char** cmds;
 
 // deal with "cd", "ll", "la".
-
 int preprocess(char* rcmd)
 {
 	if (rcmd == nullptr) return 1;
@@ -25,6 +24,7 @@ int preprocess(char* rcmd)
 	int n = 0;
 	while(p && *p && isspace(*p)) ++p;
 	
+	// simple change work dir
 	if (p[0] == 'c' && p[1] == 'd' && p[2] == ' ')
 	{
 		int i = 2;
@@ -38,7 +38,8 @@ int preprocess(char* rcmd)
 		chdir(newcmd);
 		return 1;
 	}
-
+	
+	// ll, la, lA
 	p = rcmd;
 	while(*p && isspace(*p)) ++p;
 
