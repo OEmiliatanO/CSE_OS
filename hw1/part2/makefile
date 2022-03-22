@@ -6,4 +6,4 @@ dep: Pack.cpp parser.cpp
 	$(CC) -Wall -c Pack.cpp
 	$(CC) -Wall -c parser.cpp
 clean:
-	rm *.o
+	-rm *.o

@@ -14,9 +14,12 @@ char* raw_command;
 int cmdcnt;
 char** cmds;
 
-// deal with "cd", "ll", "la",... and the path such that "~/"
-void preprocess(char* rcmd)
+// deal with "cd", "ll", "la".
+
+int preprocess(char* rcmd)
 {
+	if (rcmd == nullptr) return 1;
+
 	char *p = rcmd;
 	char *newcmd = (char*)malloc(sizeof(char) * 1000);
 	int n = 0;
@@ -26,21 +29,21 @@ void preprocess(char* rcmd)
 	{
 		int i = 2;
 		while(isspace(p[i])) ++i;
-		newcmd[n++] = 'c'; newcmd[n++] = 'd'; newcmd[n++] = ' ';
-		for (; i < strlen(p); ++i)
-		{
-
-		}
+		getcwd(newcmd, sizeof(char) * 1000);
+		int tmp = strlen(newcmd);
+		newcmd[tmp] = '/';
+		newcmd[tmp + 1] = 0;
+		strcat(newcmd, p + i);
+		//printf("to dir : %s\n", newcmd);
+		chdir(newcmd);
+		return 1;
 	}
 
-	newcmd[n] = 0;
-	memcpy(rcmd, newcmd, sizeof(char) * (n + 1));
-	n = 0;
 	p = rcmd;
-	while(p && *p && isspace(*p)) ++p;
+	while(*p && isspace(*p)) ++p;
 
-	for (int i = 0; i < strlen(p) - 1; ++i)
-		if (p[i] == 'l' && (p[i + 1] == 'l' || p[i + 1] == 'a') && (p[i + 2] == ' ' || p[i + 2] == 0))
+	for (size_t i = 0; i < strlen(p); ++i)
+		if (p[i] == 'l' && (p[i + 1] == 'l' || p[i + 1] == 'a' || p[i + 1] == 'A') && (p[i + 2] == ' ' || p[i + 2] == 0))
 		{
 			char s[] = {'l', 's', ' ', '-', p[i + 1]};
 			for (int j = 0; j < 5; ++j)
@@ -48,12 +51,14 @@ void preprocess(char* rcmd)
 			++i;
 		}
 		else newcmd[n++] = rcmd[i];
-	
+
+	//printf("newcmd : %s\n", newcmd);
 	newcmd[n] = 0;
 	memcpy(rcmd, newcmd, sizeof(char) * (n + 1));
 
-	return;
+	return 0;
 }
+
 
 // fork the child based on the pipe order (tail to head),
 // this function also deals with the redirection.
@@ -181,6 +186,8 @@ int main()
 		if (strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0) break;
 		getchar();
 
+		if (preprocess(raw_command)) continue;
+		//printf("after proess : %s\n", raw_command);
 		cmds = Cmdpar(raw_command, cmdcnt);
 		
 		pid_t pid = fork();
@@ -198,6 +205,7 @@ int main()
 			free(cmds[i]);
 		free(cmds);
 	}
+	putchar('\n');
 	free(raw_command);
 	return 0;
 }
