@@ -37,13 +37,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 void think(int i)
 {
 	printf("%d thinking...\n", i);
-	sleep(1); //sleep 500 msec
+	sleep(1); //sleep 1 sec
 }
 
 void eat(int i)
 {
 	printf("%d eating...\n", i);
-	sleep(3); // eat 1000 msec
+	sleep(3); // eat 3 sec
 }
 
 #define LEFT(i)  (((i) - 1) % MAXN + MAXN) % MAXN
