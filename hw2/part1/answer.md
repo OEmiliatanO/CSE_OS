@@ -31,7 +31,8 @@ so the efficiency is $\frac{T}{T+S}$
 (b) same as the last situation. the efficiency is $\frac{T}{T+S}$  
 (c) a process now have to go through $\lceil\frac{T}{Q}\rceil$ times of switch to finish its task.  
 so the efficiency is $\frac{T}{T+\lceil\frac{T}{Q}\rceil S}$
-(d) use the formula derived above, let $Q=S$, $T=pS+q,q<S$. $\frac{T}{T+\lceil\frac{T}{S}\rceil S}\iff\frac{T}{T+pS+\lceil\frac{q}{S}\rceil S}$, so the efficiency is $\begin{cases}\frac12, & S\mid T\\\frac{T}{T+(\lfloor\frac{T}{S}\rfloor+1)S}, & \text{else}\end{cases}$
+(d) use the formula derived above, let $Q=S$, $T=pS+q,q<S$.  
+$\frac{T}{T+\lceil\frac{T}{S}\rceil S}\iff\frac{T}{T+pS+\lceil\frac{q}{S}\rceil S}$, so the efficiency is $\begin{cases}\frac12, & S\mid T\\\frac{T}{T+(\lfloor\frac{T}{S}\rfloor+1)S}, & \text{else}\end{cases}$
 (e) $\lim_{Q\to0} \frac{T}{T+\lceil\frac{T}{Q}\rceil S}=0$, so the efficiency is $0$
 
 3. Consider the interprocess-communication scheme where mailboxes are used. Suppose a process P wants to wait for two messages, one from mailbox A and one from mailbox B. What sequence of _send_ and _receive_ should it execute so that the messages can be received in any order?  
