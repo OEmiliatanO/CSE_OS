@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pthread.h>
 #include <unistd.h>
+#include <cstdlib>
 
 constexpr int MAXN = 5;
 
@@ -37,13 +38,13 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 void think(int i)
 {
 	printf("%d thinking...\n", i);
-	sleep(1); //sleep 500 msec
+	usleep(rand() % 10000);
 }
 
 void eat(int i)
 {
 	printf("%d eating...\n", i);
-	sleep(3); // eat 1000 msec
+	usleep(rand() % 10000);
 }
 
 #define LEFT(i)  (((i) - 1) % MAXN + MAXN) % MAXN
