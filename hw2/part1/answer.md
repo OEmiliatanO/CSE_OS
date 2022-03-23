@@ -26,13 +26,20 @@ actually, x86 has a instruction called ```xchg``` which is just like the assumpt
 (e) $Q$ nearly $0$  
 
 __answer:__  
+(a) since $Q$ is unlimited, a process will run as long as it can till blocked by IO. when blocked by IO, CPU switch to next process, and so on.  
+so the efficiency is $\frac{T}{T+S}$  
+(b) same as the last situation. the efficiency is $\frac{T}{T+S}$  
+(c) a process now have to go through $\lceil\frac{T}{Q}\rceil$ times of switch to finish its task.  
+so the efficiency is $\frac{T}{T+\lceil\frac{T}{Q}\rceil S}$
+(d) use the formula derived above, let $Q=S$, $T=pS+q,q<S$. $\frac{T}{T+\lceil\frac{T}{S}\rceil S}\iff\frac{T}{T+pS+\lceil\frac{q}{S}\rceil S}$, so the efficiency is $\begin{cases}\frac12, & S\mid T\\\frac{T}{T+(\lfloor\frac{T}{S}\rfloor+1)S}, & \text{else}\end{cases}$
+(e) $\lim_{Q\to0} \frac{T}{T+\lceil\frac{T}{Q}\rceil S}=0$, so the efficiency is $0$
 
 3. Consider the interprocess-communication scheme where mailboxes are used. Suppose a process P wants to wait for two messages, one from mailbox A and one from mailbox B. What sequence of _send_ and _receive_ should it execute so that the messages can be received in any order?  
 
 __answer:__  
 assume _receive_ is implemented as ```void *receive(void* mboxWithMsg_s)``` where the parameter ```mboxWithMsg_s``` is a struct containing target mailbox and message being received.
 
-we can using pthread to achieve the request:
+we can using pthread to achieve the request:  
 
 ```c
 pthread_t mboxThdA, mboxThdB;
