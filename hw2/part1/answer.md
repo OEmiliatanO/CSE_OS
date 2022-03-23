@@ -1,5 +1,5 @@
 author: B103040012
-date: 2022/2/23
+date: 2022/3/23
 
 # Part1
 1. Consider a computer that does not have a TEST AND SET LOCK instruction but does have aninstruction to swap the contents of a register and a memory word in a single indivisible action.  
