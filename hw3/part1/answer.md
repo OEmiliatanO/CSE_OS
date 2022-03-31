@@ -16,11 +16,11 @@ so that, the waiting time won't be wasted.
 3. Consider the following set of processes, with the length of the CPU-burst time given in milliseconds:  
 | Process | Brust Time | Priority |  
 | ------- | ---------- | -------- |  
-| $P_1$   | 8 | 4 |  
-| $P_2$   | 1 | 1 |  
-| $P_3$   | 2 | 3 |  
-| $P_4$   | 1 | 5 |  
-| $P_5$   | 6 | 2 |  
+| $P_1$ | 8 | 4 |  
+| $P_2$ | 1 | 1 |  
+| $P_3$ | 2 | 3 |  
+| $P_4$ | 1 | 5 |  
+| $P_5$ | 6 | 2 |  
 
 The processes are assumed to have arrived in the order $P_1 , P_2 , P_3 , P_4 , P_5$, all at time $0$.  
 
