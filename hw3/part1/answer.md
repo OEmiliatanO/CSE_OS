@@ -28,6 +28,26 @@ ans:
 
 (a)
 
+(b)
+|       | FCFS | SJF | priority | RR |  
+|       |:----:|:---:|:--------:|:--:|  
+| $P_1$ |  8   | 18  | 17       | 18 |  
+| $P_2$ |  9   |  1  |  1       |  2 |  
+| $P_3$ | 11 	 |  4	 |  9	      |  7 |  
+| $P_4$ | 12 	 |  2  | 18       |  4 |  
+| $P_5$ | 18   | 10  |  7       | 16 |  
+
+(c)
+|       | FCFS | SJF | priority | RR |  
+|       |:----:|:---:|:--------:|:--:|  
+| $P_1$ |  0   | 10  |  9       | 10 |  
+| $P_2$ |  8   |  0  |  0       |  1 |  
+| $P_3$ |  9	 |  2	 |  7	      |  5 |  
+| $P_4$ | 11 	 |  1  | 17       |  3 |  
+| $P_5$ | 12   |  4  |  1       | 10 |  
+
+(d)
+it's SJF, whose total waiting time is 17.
 
 4. A UNIX process has two parts—the user part and the kernel part. Is the kernel part like a subroutine and a coroutine? Why?  
 
