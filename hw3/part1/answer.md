@@ -15,7 +15,7 @@ so that, the waiting time won't be wasted.
 
 3. Consider the following set of processes, with the length of the CPU-burst time given in milliseconds:  
 | Process | Brust Time | Priority |  
-| ------- | ---------- | -------- |  
+|:-------:|:----------:|:--------:|  
 | $P_1$ | 8 | 4 |  
 | $P_2$ | 1 | 1 |  
 | $P_3$ | 2 | 3 |  
