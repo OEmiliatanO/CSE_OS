@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-author: B103040012
+author: B103040012 
 date: 2022/4/1
-=======
-author: B103040012  
-date: 2022/3/23  
->>>>>>> ed50732f7092ea608837dbb6284a76e586e0705e
-
+`
 # Part1
 1. Explain what memory-mapped I/O is and how it works.  
 
