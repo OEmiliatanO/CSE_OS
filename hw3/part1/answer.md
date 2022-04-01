@@ -31,7 +31,6 @@ The processes are assumed to have arrived in the order $P1 , P2 , P3 , P4 , P5$,
 ans:  
 
 (a)
-(a)
 ```mermaid
 gantt
     title Gantt charts
