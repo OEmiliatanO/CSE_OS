@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 author: B103040012
 date: 2022/4/1
-=======
-author: B103040012  
-date: 2022/3/23  
->>>>>>> ed50732f7092ea608837dbb6284a76e586e0705e
 
 # Part1
 1. Explain what memory-mapped I/O is and how it works.  
@@ -23,13 +18,14 @@ before the interrupt from the DMA controller(which means the transfer is done), 
 so that, the waiting time won't be wasted.
 
 3. Consider the following set of processes, with the length of the CPU-burst time given in milliseconds:  
-| Process | Burst Time | Priority |  
-|:-------:|:----------:|:--------:|  
-|  $P1$  |     8      |    4     |  
-|  $P2$  |     1      |    1     |  
-|  $P3$  |     2      |    3     |  
-|  $P4$  |     1      |    5     |  
-|  $P5$  |     6      |    2     |  
+
+| Process | Burst Time | Priority |
+|-------|----------|--------|
+|  $P1$  |     8      |    4     |
+|  $P2$  |     1      |    1     |
+|  $P3$  |     2      |    3     |
+|  $P4$  |     1      |    5     |
+|  $P5$  |     6      |    2     |
 
 The processes are assumed to have arrived in the order $P1 , P2 , P3 , P4 , P5$, all at time $0$.  
 
@@ -39,7 +35,7 @@ ans:
 
 (b)
 |       | FCFS | SJF | priority | RR |  
-|       |:----:|:---:|:--------:|:--:|  
+|-----|----|:---:|:--------:|:--:|  
 | $P1$ |  8   | 18  | 17       | 18 |  
 | $P2$ |  9   |  1  |  1       |  2 |  
 | $P3$ | 11 	 |  4	 |  9	      |  7 |  
@@ -48,7 +44,7 @@ ans:
 
 (c)
 |       | FCFS | SJF | priority | RR |  
-|       |:----:|:---:|:--------:|:--:|  
+|----|:----:|:---:|:--------:|:--:|  
 | $P1$ |  0   | 10  |  9       | 10 |  
 | $P2$ |  8   |  0  |  0       |  1 |  
 | $P3$ |  9	 |  2	 |  7	      |  5 |  
