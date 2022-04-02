@@ -10,15 +10,16 @@ int main()
 {
 	monitor m(MAXN);
 	std::vector<philo> arr;
-	for (int i = 0; i < MAXN; ++i)
-		arr.push_back(philo(i, &m));
-	for (auto& it : arr)
-	{
-		std::thread t(&philo::work, std::ref(it));
-		t.detach();
-	}
+	std::vector<std::thread> threadPool;
 
-	while(true);
+	for (int i = 0; i < MAXN; ++i)
+		arr.emplace_back(i, &m);
+
+	for (auto& it : arr)
+		threadPool.emplace_back(&philo::work, std::ref(it));
+
+	for (auto& it : threadPool)
+		it.join();
 	
 	return 0;
 }

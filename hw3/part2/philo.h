@@ -18,18 +18,7 @@ public:
 	philo() = default;
 	philo(int id, monitor* m) : id(id), master(m) {}
 
-	void work()
-	{
-		//printf("%d works\n", this->id);
-		while(true)
-		{
-			think();
-			//printf("%d after thinking\n", this->id);
-			take_chops();
-			eat();
-			put_chops();
-		}
-	}	
+	void work();
 	int getid();
 };
 
