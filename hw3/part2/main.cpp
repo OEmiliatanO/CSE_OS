@@ -4,7 +4,7 @@
 #include "monitor.h"
 #include "philo.h"
 
-constexpr int MAXN = 5;
+constexpr int MAXN = 11;
 
 int main()
 {
