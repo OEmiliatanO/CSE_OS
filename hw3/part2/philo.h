@@ -1,6 +1,5 @@
 #ifndef __PHILO_H__
 #define __PHILO_H__
-#include <iostream>
 #include "monitor.h"
 
 class philo
