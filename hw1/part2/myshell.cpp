@@ -14,12 +14,14 @@ char* raw_command;
 int cmdcnt;
 char** cmds;
 
+/*
 int preprocess(char** cmds)
 {
 	if ( == 0)
 	{
 	}
 }
+*/
 
 void execute(char** cmds, int n)
 {

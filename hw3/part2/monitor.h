@@ -2,15 +2,17 @@
 #define __MONITOR_H__
 #include <iostream>
 #include <vector>
-#include <mutex>
+#include <pthread.h>
+#include <unistd.h>
+#include "semaphore.h"
 
 class monitor
 {
 	int MAXN;
-	std::vector<std::mutex*> arr;
+	std::vector<semaphore_t*> arr;
 
 public:
-	monitor(int n) : MAXN(n) { for (int i = 0; i < MAXN; ++i) arr.push_back(new std::mutex()); }
+	monitor(int n) : MAXN(n) { for (int i = 0; i < MAXN; ++i) arr.push_back(new semaphore_t(1)); }
 	~monitor() { for (int i = 0; i < MAXN; ++i) delete arr[i]; }
 
 	void lock(int i);

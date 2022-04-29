@@ -2,12 +2,12 @@
 
 void monitor::lock(int i)
 {
-	this->arr[i]->lock();
+	this->arr[i]->down();
 }
 
 void monitor::unlock(int i)
 {
-	this->arr[i]->unlock();
+	this->arr[i]->up();
 }
 
 int monitor::getn()
