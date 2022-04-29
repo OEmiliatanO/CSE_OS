@@ -3,9 +3,9 @@
 
 #include <stddef.h>
 
-void *mymalloc(size_t size);
+void *mymalloc(size_t raw_size);
 void myfree(void *ptr);
-void *myrealloc(void *ptr, size_t size);
-void *mycalloc(size_t nmemb, size_t size);
+void *myrealloc(void *ptr, size_t raw_size);
+void *mycalloc(size_t nmemb, size_t raw_size);
 
 #endif

@@ -1,16 +1,13 @@
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include "mm.h"
-#define perr(...) fprintf(stderr, __VA_ARGS__)
-#define bool char
 
-extern void init();
+#define bool char
+#define perr(...) fprintf(stderr, __VA_ARGS__);
 
 int main()
 {
-	init();
-	const size_t clen = 15, ilen = 20, flen = 15, dlen = 30, blen = 100;
+	const size_t clen = 15, ilen = 20, flen = 15, dlen = 25, blen = 100;
 
 	perr("allocate char * %ld\n", clen);
 	char *carr = (char *)mymalloc(sizeof(char) * clen);
@@ -35,18 +32,26 @@ int main()
 	myfree(iarr);
 	perr("free float * %ld\n", flen);
 	myfree(farr);
-	
-	perr("heap top = %p\n\n", sbrk(0));
 
 	perr("allocate double * %ld\n", dlen);
 	double *darr = (double *)mymalloc(sizeof(double) * dlen);
+	for (int i = 0; i < dlen; ++i) darr[i] = (double)i;
+
 	perr("allocate bool * %ld\n", blen);
 	bool *barr = (bool *)mymalloc(sizeof(bool) * blen);
 
-	perr("free double * %ld\n", dlen);
-	myfree(darr);
 	perr("free bool * %ld\n", blen);
 	myfree(barr);
+
+	perr("realloc double * %ld\n", dlen + 1);
+	darr = (double *)myrealloc(darr, sizeof(double) * (dlen + 1));
+	for (int i = 0; i < dlen; ++i) perr("%.02lf ", darr[i]);
+	perr("\n");
+
+	perr("realloc double * %ld\n", dlen + 15);
+	darr = (double *)myrealloc(darr, sizeof(double) * (dlen + 15));
+	for (int i = 0; i < dlen; ++i) perr("%.02lf ", darr[i]);
+	perr("\n");
 
 	return 0;
 }

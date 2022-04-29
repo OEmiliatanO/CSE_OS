@@ -1,9 +1,15 @@
 #include "mm.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+
+#ifdef _DEBUG_
+#define perr(...) fprintf(stderr, __VA_ARGS__)
+#else
+#define perr(...) 
+#endif
 
 #define MEM_t void *
-#define perr(...) fprintf(stderr, __VA_ARGS__)
 #define SIZE(h) h->head.size
 #define NEXT(h) h->head.nex
 
@@ -32,6 +38,7 @@ size_t align(size_t require)
 	return (require + (unit - 1)) & ~(unit - 1);
 }
 
+/*
 void printinfo(void *adr)
 {
 	header *p = (header *)adr - 1;
@@ -39,6 +46,7 @@ void printinfo(void *adr)
 	perr("! this size: %ld\n", SIZE(p));
 	perr("! -> %p\n", NEXT(p));
 }
+*/
 
 void printFree_list()
 {
@@ -129,13 +137,14 @@ MEM_t mymalloc(size_t raw_size)
 
 	perr("! error occurs in myalloc(%ld)\n", raw_size);
 	perr("\n\n");
-	//printFree_list();
 
 	return nullptr;
 }
 
 void myfree(void *blocks)
 {
+	if (blocks == nullptr) return;
+
 	perr("! call myfree(%p)\n\n", blocks);
 
 	header *blkhead = (header *)blocks - 1;
@@ -206,13 +215,77 @@ void myfree(void *blocks)
 	printFree_list();
 }
 
-void *myrealloc(void *ptr, size_t size)
+MEM_t myrealloc(void *ptr, size_t raw_size)
 {
-	return NULL;
+	if (ptr == nullptr) return mymalloc(raw_size);
+
+	size_t size = SIZE(((header *)ptr - 1));
+	if (size >= raw_size) return ptr;
+	myfree(ptr);
+	void *res = mymalloc(raw_size);
+	memcpy(res, ptr, size);
+	return res;
+	/*
+	header *blkhead = (header *)ptr - 1;
+	header *pos;
+	size_t size = align(unit + raw_size);
+
+	if (SIZE(blkhead) >= size) return ptr;
+
+	for (pos = &base; ; pos = NEXT(pos))
+	{
+		if ((MEM_t)pos < (MEM_t)blkhead && (MEM_t)blkhead < (MEM_t)NEXT(pos))
+			break;
+		if ((MEM_t)pos >= (MEM_t)NEXT(pos) && ((MEM_t)blkhead > (MEM_t)pos || (MEM_t)blkhead < (MEM_t)NEXT(pos)))
+			break;
+	}
+
+	if (blkhead + SIZE(blkhead) / unit == NEXT(pos))
+	{
+		perr("!! right side of block may be merged.\n");
+		if (SIZE(blkhead) + SIZE(NEXT(pos)) >= size)
+		{
+			if (SIZE(blkhead) + SIZE(NEXT(pos)) - size >= (unit << 1))
+			{// merge the partial right side of block
+				header *nexoffset = NEXT(pos) - SIZE(blkhead) + size;
+				SIZE(nexoffset) = SIZE(blkhead) + SIZE(NEXT(pos)) - size;
+				NEXT(nexoffset) = NEXT(NEXT(pos));
+				NEXT(pos) = nexoffset;
+				SIZE(blkhead) = size;
+				return (MEM_t)(blkhead + 1);
+			}
+			else
+			{// merge the whole right side of block
+				SIZE(blkhead) += SIZE(NEXT(pos));
+				NEXT(pos) = NEXT(NEXT(pos));
+				return (MEM_t)(blkhead + 1);
+			}
+		}
+		else
+		{
+			perr("!! right side of block can't be merged.\n");
+			void *res = mymalloc(raw_size);
+			memcpy(res, ptr, ((header *)ptr - 1)->size - unit);
+			myfree(ptr);
+			return res;
+		}
+		//perr("!! after merged:\n");
+	}
+	else
+	{
+		perr("!! right side of block can't be merged.\n");
+		void *res = mymalloc(raw_size);
+		memcpy(res, ptr, ((header *)ptr - 1)->size - unit);
+		myfree(ptr);
+		return res;
+	}
+	*/
 }
 
 void *mycalloc(size_t nmemb, size_t size)
 {
-	return NULL;
+	void *res = mymalloc(nmemb * size);
+	memset(res, 0, nmemb * size);
+	return res;
 }
 
