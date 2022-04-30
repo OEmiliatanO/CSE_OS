@@ -3,51 +3,76 @@
 #include <stdio.h>
 #include <string.h>
 
+// if _DEBUG_ label isn't defined from gcc, 
+// perr(...) won't work
 #ifdef _DEBUG_
 #define perr(...) fprintf(stderr, __VA_ARGS__)
 #else
 #define perr(...) 
 #endif
 
+// memory space type
 #define MEM_t void *
-#define SIZE(h) h->head.size
-#define NEXT(h) h->head.nex
 
+// for use c++ keyword and function
 #define nullptr NULL
 #define constexpr const
+#define min(a, b) ((a)>(b) ? (b):(a))
 
+// block header, the number of bytes occupied by header shall be fixed.
+// use union for alignment, 
+// e.g. if sizeof(size_t) + sizeof(header *) < 8, then sizeof(header) is still 8.
 typedef union header
 {
+	// the header
 	struct major
 	{
-		// member "size" represents the size of header plus the actual free space.
+		// .size: the size of header plus the actual free space.
 		size_t size;
+		// .nex : the 
 		union header *nex;
 	}head;
+
+// for convenient usage
+#define SIZE(h) h->head.size
+#define NEXT(h) h->head.nex
 
 	// for alignment
 	long _;
 }header;
 
+// unit: the smallest unit for allocating a space
 constexpr size_t unit = sizeof(header);
 
-header base, *free_list;
+// base: the head of free space list.
+header base;
 
+// *free_list: 
+// the pointer of free space list,
+// it always points to a node containing free space.
+// it shall initialized as nullptr.
+header *free_list = nullptr;
+
+
+// make required space aligned with 16*n, namely "unit"*n
+// e.g. 3->16, 15->16, 17->32, 33->48
+
+// WARNING: this function only work when "unit" is the power of 2
 size_t align(size_t require)
 {
 	return (require + (unit - 1)) & ~(unit - 1);
 }
 
-/*
-void printinfo(void *adr)
+// debug, print the header info
+void printinfo(header *h)
 {
-	header *p = (header *)adr - 1;
-	perr("! position: %p\n", p);
-	perr("! this size: %ld\n", SIZE(p));
-	perr("! -> %p\n", NEXT(p));
+	perr("! position begin: %p\n", h);
+	perr("! end: %p\n", h + SIZE(h) / unit);
+	perr("! this size: %ld\n", SIZE(h));
+	perr("! -> %p\n", NEXT(h));
 }
-*/
 
+// debug, print the whole free space list
 void printFree_list()
 {
 	perr("====free_list====\n");
@@ -55,79 +80,118 @@ void printFree_list()
 	header *p = free_list;
 	do
 	{
-		perr("!! position: %p\n", p);
-		perr("!! this size: %ld\n", SIZE(p));
-		perr("!! -> %p\n", NEXT(p));
+		printinfo(p);
 		p = NEXT(p);
 	}while(p && p != free_list);
 	perr("=================\n");
 }
 
-void init()
+// debug, print the environment variables
+void printenv()
 {
 	perr("! unit: %ld\n", unit);
 	perr("! base: %p\n", &base);
 	perr("! sizeof(size_t): %ld\n", sizeof(size_t));
 }
 
+// mymalloc(size):
+// return a void pointer, mem,
+// points to a free space containing "size" bytes.
+
+// the backward access of mem is illegal,
+// may cause segment fault.
 MEM_t mymalloc(size_t raw_size)
 {
+	if (raw_size <= 0) return nullptr;
+	
 	perr("! call mymalloc(%ld)\n\n", raw_size);
+	
+	// iterators for free space list
 	header *pre, *mem;
-	size_t size = align(unit + raw_size);
-	perr("! size really need: %ld\n", size);
 
+	// size: includes the header size and user required size
+	size_t size = align(unit + raw_size);
+
+	perr("! size really need: %ld\n", size);
+	
+	// first use of mymalloc
 	if (free_list == nullptr)
 	{
-		perr("!! first call of myalloc(%ld).\n", raw_size);
+		perr("!! first call of myalloc(%ld).\n\n", raw_size);
+		// initialize
 		free_list = &base;
 		base.head.nex = &base;
 		base.head.size = 0;
 	}
 	
-	perr("! myalloc(%ld)\n", raw_size);
 	printFree_list();
 	
-	perr("! for loop to find the fit node.\n");
+	perr("\n! for loop to find the fit node.\n\n");
+
+	// iterate the whole free space list,
+	// to find a proper space for allocate.
 	for (pre = free_list, mem = NEXT(free_list); ; pre = mem, mem = NEXT(mem))
 	{
 		perr("!! for loop:\n");
-		perr("!! pre = %p\n", pre);
-		perr("!! -> %p\n", NEXT(pre));
-		perr("!! mem = %p\n", mem);
-		perr("!! -> %p\n", NEXT(mem));
+		perr("!! pre:\n");
+		printinfo(pre);
+		perr("!! mem:\n");
+		printinfo(mem);
+
+		// found a proper space,
+		// need to determine that whether this space can be split or not.
+		// if after split, the size of free space remains >= 2*unit, split it.
+		// if not, just allocate the whole free space.
 		if (SIZE(mem) >= size)
 		{
-			perr("!!! inside block: if (SIZE(mem) >= size)\n");
-			perr("!!! find node in %p, whose size is %ld\n", mem, SIZE(mem));
+			perr("\n!!! inside block: if (SIZE(mem) >= size)\n");
+			
+			// space remains < 2*unit
 			if (SIZE(mem) - size < (unit << 1))
 			{
-				perr("!!!! size of mem(%ld) - requested mem(%ld) < 2*unit(%ld)\n", SIZE(mem), size, unit << 1);
-				free_list = pre;
+				perr("\n!!!! size of mem(%ld) - requested mem(%ld) < 2*unit(%ld)\n", SIZE(mem), size, unit << 1);
+
+				// remove mem from free space list.
 				NEXT(pre) = NEXT(mem);
 			}
+			// space remains >= 2*unit
 			else
 			{
-				perr("!!!! size of mem(%ld) - requested mem(%ld) >= 2*unit(%ld)\n", SIZE(mem), size, unit << 1);
-				free_list = pre;
+				perr("\n!!!! size of mem(%ld) - requested mem(%ld) >= 2*unit(%ld)\n", SIZE(mem), size, unit << 1);
+				
+				// the beginning of right side of mem
 				header *memoffset = mem + size / unit;
+
+				// remove the left side of mem from free space list.
 				NEXT(pre) = memoffset;
 				SIZE(memoffset) = SIZE(mem) - size;
 				NEXT(memoffset) = NEXT(mem);
 				SIZE(mem) = size;
 			}
-			perr("!!! mem: %p\n", mem);
+
+			// points to a free node
+			free_list = pre;
+			
+			perr("!!! pre:\n");
+			printinfo(pre);
+			perr("!!! mem:\n");
+			printinfo(mem);
 			perr("!!! return %p\n", mem + 1);
 			perr("\n\n");
+			
 			return (MEM_t)(mem + 1);
 		}
 
+		// this means the free space list contains no proper space,
+		// require more space from OS.
 		if (mem == free_list)
 		{
 			perr("!!! inside block: if (mem == free_list)\n");
+			
 			mem = sbrk(0);
 			sbrk(size);
 			SIZE(mem) = size;
+
 			perr("!!! mem: %p\n", mem);
 			perr("!!! return %p\n", mem + 1);
 			perr("\n\n");
@@ -135,12 +199,22 @@ MEM_t mymalloc(size_t raw_size)
 		}
 	}
 
+	// this section will never be executed,
+	// except an error occurs.
 	perr("! error occurs in myalloc(%ld)\n", raw_size);
 	perr("\n\n");
 
 	return nullptr;
 }
 
+
+// myfree(blocks):
+// will release the space of "blocks".
+// make this space back to the free space list,
+// then can be available for later allocation.
+
+// also, the access of freed pointer is illegal,
+// may cause segment fault.
 void myfree(void *blocks)
 {
 	if (blocks == nullptr) return;
@@ -152,29 +226,31 @@ void myfree(void *blocks)
 
 	perr("! the block to release: %p\n", blkhead);
 
+	// find the location of this space.
+	// it may between two nodes in free space list
+	// or after the end node of free space list
 	for (pos = &base; ; pos = NEXT(pos))
 	{
+		// between two nodes ?
 		if ((MEM_t)pos < (MEM_t)blkhead && (MEM_t)blkhead < (MEM_t)NEXT(pos))
 			break;
+		// at right end ?
 		if ((MEM_t)pos >= (MEM_t)NEXT(pos) && ((MEM_t)blkhead > (MEM_t)pos || (MEM_t)blkhead < (MEM_t)NEXT(pos)))
 			break;
 	}
-
-	perr("! blkhead: %p\n", blkhead);
-	perr("! blkhead.size: %ld\n", SIZE(blkhead));
-	perr("! blkhead + blkhead.size: %p\n", blkhead + SIZE(blkhead)/ unit);
-
-	perr("! pos: %p\n", pos);
-	perr("! pos.size: %ld\n", SIZE(pos));
-	perr("! pos + pos.size: %p\n", pos + SIZE(pos)/ unit);
-	perr("! -> %p\n", NEXT(pos));
 	
+	perr("! blkhead:\n");
+	printinfo(blkhead);
 
-	perr("! pos.next: %p\n", NEXT(pos));
-	perr("! pos.nex.size: %ld\n", SIZE(NEXT(pos)));
-	perr("! pos.nex + pos.nex.size: %p\n", NEXT(pos) + SIZE(NEXT(pos))/ unit);
-	perr("! -> %p\n", NEXT(NEXT(pos)));
+	perr("! pos:\n");
+	printinfo(pos);
+	
+	perr("! pos.next:\n");
+	printinfo(NEXT(pos));
 
+	// the right of blkhead is adjacent to a free node,
+	// therefore, it can be merged.
+	perr("\n");
 	if (blkhead + SIZE(blkhead) / unit == NEXT(pos))
 	{
 		perr("!! right of block can be merged.\n");
@@ -182,16 +258,20 @@ void myfree(void *blocks)
 		NEXT(blkhead) = NEXT(NEXT(pos));
 		perr("!! after merged:\n");
 	}
+	// otherwise, cannot be merged
 	else
 	{
 		perr("!! right of block can't be merged.\n");
 		NEXT(blkhead) = NEXT(pos);
 	}
+	perr("\n");
 
-	perr("! blkhead: %p\n", blkhead);
-	perr("! blkhead.size: %ld\n", SIZE(blkhead));
-	perr("! -> %p\n", NEXT(blkhead));
+	perr("! blkhead\n");
+	printinfo(blkhead);
 	
+	perr("\n");
+	// the left of blkhead is adjacent to a free node,
+	// therefore, it can be merged.
 	if (pos + SIZE(pos) / unit == blkhead)
 	{
 		perr("!! left of block can be merged.\n");
@@ -199,89 +279,51 @@ void myfree(void *blocks)
 		NEXT(pos) = NEXT(blkhead);
 		perr("!! after merged:\n");
 	}
+	// otherwise, cannot be merged
 	else 
 	{
 		perr("!! left of block can't be merged.\n");
 		NEXT(pos) = blkhead;
 	}
+	perr("\n");
 
-	perr("!! pos: %p\n", pos);
-	perr("!! pos.size: %ld\n", SIZE(pos));
-	perr("!! -> %p\n", NEXT(pos));
+	perr("! pos:\n");
+	printinfo(pos);
 
 	perr("\n\n");
 	
 	free_list = pos;
 	printFree_list();
+	perr("\n");
 }
 
+// myrealloc(address, size):
+// make the space contained by address adjust to size.
+// the data will remain, but may be truncated if the adjusted size is smaller.
 MEM_t myrealloc(void *ptr, size_t raw_size)
 {
+	perr("! call myrealloc(%p, %ld)\n", ptr, raw_size);
 	if (ptr == nullptr) return mymalloc(raw_size);
 
 	size_t size = SIZE(((header *)ptr - 1));
-	if (size >= raw_size) return ptr;
+
+	// the space is adequate
+	if (size >= raw_size)
+	{
+		perr("!! the space have been adequate.\n\n");
+		return ptr;
+	}
+
 	myfree(ptr);
 	void *res = mymalloc(raw_size);
-	memcpy(res, ptr, size);
+	memcpy(res, ptr, min(raw_size, size));
+	
+	perr("! myrealloc is done\n\n");
 	return res;
-	/*
-	header *blkhead = (header *)ptr - 1;
-	header *pos;
-	size_t size = align(unit + raw_size);
-
-	if (SIZE(blkhead) >= size) return ptr;
-
-	for (pos = &base; ; pos = NEXT(pos))
-	{
-		if ((MEM_t)pos < (MEM_t)blkhead && (MEM_t)blkhead < (MEM_t)NEXT(pos))
-			break;
-		if ((MEM_t)pos >= (MEM_t)NEXT(pos) && ((MEM_t)blkhead > (MEM_t)pos || (MEM_t)blkhead < (MEM_t)NEXT(pos)))
-			break;
-	}
-
-	if (blkhead + SIZE(blkhead) / unit == NEXT(pos))
-	{
-		perr("!! right side of block may be merged.\n");
-		if (SIZE(blkhead) + SIZE(NEXT(pos)) >= size)
-		{
-			if (SIZE(blkhead) + SIZE(NEXT(pos)) - size >= (unit << 1))
-			{// merge the partial right side of block
-				header *nexoffset = NEXT(pos) - SIZE(blkhead) + size;
-				SIZE(nexoffset) = SIZE(blkhead) + SIZE(NEXT(pos)) - size;
-				NEXT(nexoffset) = NEXT(NEXT(pos));
-				NEXT(pos) = nexoffset;
-				SIZE(blkhead) = size;
-				return (MEM_t)(blkhead + 1);
-			}
-			else
-			{// merge the whole right side of block
-				SIZE(blkhead) += SIZE(NEXT(pos));
-				NEXT(pos) = NEXT(NEXT(pos));
-				return (MEM_t)(blkhead + 1);
-			}
-		}
-		else
-		{
-			perr("!! right side of block can't be merged.\n");
-			void *res = mymalloc(raw_size);
-			memcpy(res, ptr, ((header *)ptr - 1)->size - unit);
-			myfree(ptr);
-			return res;
-		}
-		//perr("!! after merged:\n");
-	}
-	else
-	{
-		perr("!! right side of block can't be merged.\n");
-		void *res = mymalloc(raw_size);
-		memcpy(res, ptr, ((header *)ptr - 1)->size - unit);
-		myfree(ptr);
-		return res;
-	}
-	*/
 }
 
+// mycalloc(n, size):
+// is like mymalloc(n*size), then initialize the space as zero.
 void *mycalloc(size_t nmemb, size_t size)
 {
 	void *res = mymalloc(nmemb * size);

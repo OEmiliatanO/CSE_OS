@@ -53,5 +53,15 @@ int main()
 	for (int i = 0; i < dlen; ++i) perr("%.02lf ", darr[i]);
 	perr("\n");
 
+	/*
+	perr("realloc double * %ld\n", dlen - 5);
+	darr = (double *)myrealloc(darr, sizeof(double) * (dlen - 5));
+	for (int i = 0; i < dlen - 5; ++i) perr("%.02lf ", darr[i]);
+	perr("\n");
+	*/
+
+	perr("free double * %ld\n", dlen + 15);
+	myfree(darr);
+
 	return 0;
 }
