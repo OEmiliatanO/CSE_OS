@@ -5,14 +5,20 @@ date: 2022/5/1
 1. What is the difference between a hard link and a symbolic link? Give an advantage of each one.  
 
 __ans:__  
+hard link uses the same inode of the target file, namely they're the same files, while the inode of symbolic link is different from the target file, it's just like a shortcut.  
 
+the advantage of symbolic link is that it's able to link to another directory or file, and even link to the file on another disk, which hard link can't do.  
+and when the target file of symbolic link is removed, the symbolic link won't be able to open till a file with the same target name be created again.  
+
+the advantage of hard link is that there's no space and time cost, compared to symbolic link.  
+when the target file of hard link is removed, the hard link still exists, since "it's the file itself".  
 
 2. A disk has 4000 cylinders, each with 8 tracks of 512 blocks. A seek takes 1 msec per cylinder moved. If no attempt is made to put the blocks of a file close to each other, two blocks that are logically consecutive (i.e., follow one another in the file) will require an average seek, which takes 5 msec. If, however, the operating system makes an attempt to cluster related blocks, the mean interblock distance can be reduced to 2 cylinders and the seek time reduced to 100 microsec. How long does it take to read a 100 block file in both cases, if the rotational latency is 10 msec and the transfer time is 20 microsec per block?  
 
 __ans:__  
 
 
-3. Consider the following page reference string: ```1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6```. How many page faults would occur for the following replacement algorithms, assuming one, two, three, four, five, six, or seven frames? Remember all frames are initially empty, so your first unique pages will all cost one fault each.
+3. Consider the following page reference string: "1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6". How many page faults would occur for the following replacement algorithms, assuming one, two, three, four, five, six, or seven frames? Remember all frames are initially empty, so your first unique pages will all cost one fault each.  
 
 __ans:__  
 
