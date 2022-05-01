@@ -2,26 +2,11 @@ author: B103040012
 date: 2022/5/1 
 
 # Part1
-1. A computer has four page frames. The time of loading, time of last access, and the R and M bits for each page are as shown below (the times are in clock ticks):
-
-| Page | Loaded | Last Reference | R   | M   |
-| ---- | ------ | -------------- | --- | --- |
-| 0    | 126    | 279            | 0   | 0   |
-| 1    | 230    | 260            | 1   | 0   |
-| 2    | 120    | 272            | 1   | 1   |
-| 3    | 160    | 280            | 1   | 1   |
-
-	a. Which page will NRU replace?  
-	b. Which page will FIFO replace?  
-	c. Which page will LRU replace?  
-	d. Which page will second chance replace?  
+1. What is the difference between a hard link and a symbolic link? Give an advantage of each one.
 
 __ans:__  
 
-a. Page 0. since NRU pick from the RM bitset (0,0), (0,1), (1,0), (1,1).  
-b. Page 2. since it's the oldest page.  
-c. Page 1. since it's last reference is the earliest.  
-d. Page 0.  
+
 
 2. A small computer has 8 page frames, each containing a page. The page frames contain virtual pages A, C, G, H, B, L, N , and D in that order. Their respective load times were 18, 23, 5, 7, 32, 19, 3, and 8. Their reference bits are 1, 0, 1, 1, 0, 1, 1, and 0 and their modified bits are 1, 1, 1, 0, 0, 0, 1, and 1, respectively. Which page will the second chance page replacement algorithm replace?
 
