@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// if _DEBUG_ label isn't defined from gcc, 
-// perr(...) won't work
 #ifdef _DEBUG_
 #define perr(...) fprintf(stderr, __VA_ARGS__)
 #else
@@ -13,6 +11,7 @@
 
 // memory space type
 #define MEM_t void *
+#define PRIV static
 
 // for use c++ keyword and function
 #define nullptr NULL
@@ -29,7 +28,7 @@ typedef union header
 	{
 		// .size: the size of header plus the actual free space.
 		size_t size;
-		// .nex : the 
+		// .nex : the next free node.
 		union header *nex;
 	}head;
 
@@ -42,29 +41,29 @@ typedef union header
 }header;
 
 // unit: the smallest unit for allocating a space
-constexpr size_t unit = sizeof(header);
+PRIV constexpr size_t unit = sizeof(header);
 
 // base: the head of free space list.
-header base;
+PRIV header base;
 
 // *free_list: 
 // the pointer of free space list,
 // it always points to a node containing free space.
 // it shall initialized as nullptr.
-header *free_list = nullptr;
+PRIV header *free_list = nullptr;
 
 
 // make required space aligned with 16*n, namely "unit"*n
 // e.g. 3->16, 15->16, 17->32, 33->48
 
 // WARNING: this function only work when "unit" is the power of 2
-size_t align(size_t require)
+PRIV size_t align(size_t require)
 {
 	return (require + (unit - 1)) & ~(unit - 1);
 }
 
 // debug, print the header info
-void printinfo(header *h)
+PRIV void printinfo(header *h)
 {
 	perr("! position begin: %p\n", h);
 	perr("! end: %p\n", h + SIZE(h) / unit);
@@ -73,7 +72,7 @@ void printinfo(header *h)
 }
 
 // debug, print the whole free space list
-void printFree_list()
+PRIV void printFree_list()
 {
 	perr("====free_list====\n");
 	perr("! free_list points to %p\n", free_list);
@@ -87,7 +86,7 @@ void printFree_list()
 }
 
 // debug, print the environment variables
-void printenv()
+void MMenv()
 {
 	perr("! unit: %ld\n", unit);
 	perr("! base: %p\n", &base);
