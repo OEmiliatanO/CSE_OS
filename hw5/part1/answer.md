@@ -2,52 +2,27 @@ author: B103040012
 date: 2022/5/1 
 
 # Part1
-1. What is the difference between a hard link and a symbolic link? Give an advantage of each one.
+1. What is the difference between a hard link and a symbolic link? Give an advantage of each one.  
 
 __ans:__  
 
 
-
-2. A small computer has 8 page frames, each containing a page. The page frames contain virtual pages A, C, G, H, B, L, N , and D in that order. Their respective load times were 18, 23, 5, 7, 32, 19, 3, and 8. Their reference bits are 1, 0, 1, 1, 0, 1, 1, and 0 and their modified bits are 1, 1, 1, 0, 0, 0, 1, and 1, respectively. Which page will the second chance page replacement algorithm replace?
-
-__ans:__
-
-sort them into FIFO order:  
-
-|                | N | G | H | D | A | L | C | B |
-| -------------- | - | - | - | - | - | - | - | - |
-| Last Reference | 3 | 5 | 7 | 8 | 18| 19| 23| 32|
-| R              | 1 | 1 | 1 | 0 | 1 | 1 | 0 | 0 |
-| M              | 1 | 1 | 0 | 1 | 1 | 0 | 1 | 0 |  
-
-so second chane replace algorithm will pick page D to replace.  
-
-3. What is the difference between a physical address and a virtual address?  
+2. A disk has 4000 cylinders, each with 8 tracks of 512 blocks. A seek takes 1 msec per cylinder moved. If no attempt is made to put the blocks of a file close to each other, two blocks that are logically consecutive (i.e., follow one another in the file) will require an average seek, which takes 5 msec. If, however, the operating system makes an attempt to cluster related blocks, the mean interblock distance can be reduced to 2 cylinders and the seek time reduced to 100 microsec. How long does it take to read a 100 block file in both cases, if the rotational latency is 10 msec and the transfer time is 20 microsec per block?  
 
 __ans:__  
 
-a virtual address is limited by the word length in the machine. for example, a 32-bit machine can address $0 \~ 2^{32}-1$ in virtual address, and a 64-bit machine can address $0 \~ 2^{64} - 1$ in virtual machine.  
-but a physical address is limited by the real memory size. for example, assume there's a 1MB RAM, the physical address will be in $[0,2^{20}-1]$.  
 
-a virtual address points to a virtual store position viewed by a process.  
-but a physical address points to a position on a physical memory.  
-
-4. Are there any circumstances in which clock and second chance choose different pages to replace? If so, what are they? 
+3. Consider the following page reference string: ```1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6```. How many page faults would occur for the following replacement algorithms, assuming one, two, three, four, five, six, or seven frames? Remember all frames are initially empty, so your first unique pages will all cost one fault each.
 
 __ans:__  
 
-they are the same essentially, just represent in different way.  
-so there's no circumstance where clock and second chance choose different pages to replace.  
 
-5. A small computer has four page frames. At the first clock tick, the R bits are 0111 (page 0 is 0, the rest are 1). At subsequent clock ticks, the values are 1011, 1010, 1101, 0010, 1010, 1100, and 0001. If the aging algorithm is used with an 8-bit counter, give the values of the four counters after the last ticks.  
+4. Consider a file currently consisting of 100 blocks. Assume that the file control block (and the index block, in the case of indexed allocation) is already in memory. Calculate how many disk I/O operations are required for contiguous, linked, and indexed (single-level) allocation strategies, if, for one block, the following conditions hold. In the contiguous allocation case, assume that there is no room to grow in the beginning, but there is room to grow in the end. Assume that the block information to be added is stored in memory.
 
 __ans:__  
 
-| pages  | counter  |
-| ------ | -------- |
-| page 0 | 01101110 |
-| page 1 | 01001001 |
-| page 2 | 00110111 |
-| page 3 | 10001011 |
 
+5. A certain computer provides its users with a virtual-memory space of $2^{32}$ bytes. The computer has $2^{18}$ bytes of physical memory. The virtual memory is implemented by paging, and the page size is 4096 bytes. A user process generates the virtual address 11123456. Explain how the system establishes the corresponding physical location. Distinguish between software and hardware operations.
+
+__ans:__  
 
