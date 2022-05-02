@@ -16,7 +16,10 @@ when the target file of hard link is removed, the hard link still exists, since 
 2. A disk has 4000 cylinders, each with 8 tracks of 512 blocks. A seek takes 1 msec per cylinder moved. If no attempt is made to put the blocks of a file close to each other, two blocks that are logically consecutive (i.e., follow one another in the file) will require an average seek, which takes 5 msec. If, however, the operating system makes an attempt to cluster related blocks, the mean interblock distance can be reduced to 2 cylinders and the seek time reduced to 100 microsec. How long does it take to read a 100 block file in both cases, if the rotational latency is 10 msec and the transfer time is 20 microsec per block?  
 
 __ans:__  
+disk cost time: seek + ratational latency + transfer time.  
 
+non-optimial algorithm: (5 + 10 + 0.02) * 100 = 1502 ms.
+optimial algorithm: (0.1 * 2 + 10 + 0.02) * 100 = 1022 ms.
 
 3. Consider the following page reference string: "1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6". How many page faults would occur for the following replacement algorithms, assuming one, two, three, four, five, six, or seven frames? Remember all frames are initially empty, so your first unique pages will all cost one fault each.  
 
@@ -31,4 +34,12 @@ __ans:__
 5. A certain computer provides its users with a virtual-memory space of $2^{32}$ bytes. The computer has $2^{18}$ bytes of physical memory. The virtual memory is implemented by paging, and the page size is 4096 bytes. A user process generates the virtual address 11123456. Explain how the system establishes the corresponding physical location. Distinguish between software and hardware operations.
 
 __ans:__  
+
+assume 11123456 is decimal, the binary form of it is, 0b0000 0000 1010 1001 1011 1011 0000 0000.  
+the higher 20 bits will be used as the index of page table, whose content inside is used as the physical page number, and the lower 12 bits will be used as the offset of the physical page.  
+if 11123456 is in hex, the process is the same. just the binary form is different.  
+
+distinguish between software and hardware operations:  
+the hardware part handles the address translation dynamically. and the software part takes care of page IO.
+
 
