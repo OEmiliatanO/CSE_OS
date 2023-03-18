@@ -35,7 +35,7 @@ int getRedirFile(char *src, char sp, char *des)
 	return res;
 }
 
-char** Cmdpar(char *raw_command, int& num)
+char** cmdpar(char *raw_command, int& num)
 {
 	int lenOfrcmd = strlen(raw_command);
 	num = cntpipe(raw_command, lenOfrcmd) + 1;

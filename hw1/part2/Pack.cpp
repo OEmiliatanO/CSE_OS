@@ -15,6 +15,7 @@ int cmdcnt;
 char** cmds;
 
 constexpr int MAXN_CMD = 1000;
+constexpr size_t MAXN_ARG = 100;
 
 // deal with "cd", "ll", "la".
 int preprocess(char* rcmd)
@@ -130,7 +131,6 @@ void execute(char** cmds, int n)
 	//printf("after erase the redirection section: %s", cmd);
 
 	// deal with the argument
-    constexpr size_t MAXN_ARG = 100;
 	char **argv = (char**)calloc(MAXN_ARG, sizeof(char*));
 	int p = 0, argc = 0;
 	while(isspace(cmd[p])) ++p;
@@ -181,25 +181,36 @@ void execute(char** cmds, int n)
 	exit(0);
 }
 
+char * gen_inp_pattern()
+{
+    char * inp = (char*)malloc(sizeof(char) * 50);
+    while (sprintf(inp, " %d[^\n]s", MAXN_CMD) < 0) { fprintf(stderr, "Cannot generate input pattern.\nTry to re-generate..."); }
+    inp[0] = '%';
+    return inp;
+}
+
+void prompt(char * const cwd, char const * const prompt_word)
+{
+    fprintf(stdout, "%s", cwd);
+    fprintf(stdout, " %s ", prompt_word);
+}
+
 int main()
 {
-    char * const inp = (char*)malloc(sizeof(char) * 50);
+    char * const inp = gen_inp_pattern();
     char * const cwd = (char*)malloc(sizeof(char) * MAXN_CMD);
+    char prompt_word[] = "$>";
 	raw_command = (char*)malloc(sizeof(char) * MAXN_CMD);
 	while(true)
 	{
         if (getcwd(cwd, sizeof(char) * MAXN_CMD) == nullptr) { fprintf(stderr, "Cannot get current working directory.\n"); continue; }
-        fprintf(stdout, "%s", cwd);
-		fprintf(stdout, "$ ");
-        if (sprintf(inp, " %d[^\n]s", MAXN_CMD) < 0) { fprintf(stderr, "Cannot generate input pattern.\nTry to re-generate..."); continue; };
-        inp[0] = '%';
-		if (scanf(inp, raw_command) == -1) break;
-		if (strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0) break;
-		getchar();
+        prompt(cwd, prompt_word);
+		int scan_res = scanf(inp, raw_command); getchar();
+		if (strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0 || scan_res == -1) break;
 
 		if (preprocess(raw_command)) continue;
 		//printf("after proess : %s\n", raw_command);
-		cmds = Cmdpar(raw_command, cmdcnt);
+		cmds = cmdpar(raw_command, cmdcnt);
 		
 		pid_t pid = fork();
 		int status;
