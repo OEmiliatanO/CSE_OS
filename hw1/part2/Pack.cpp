@@ -14,13 +14,15 @@ char* raw_command;
 int cmdcnt;
 char** cmds;
 
+constexpr int MAXN_CMD = 1000;
+
 // deal with "cd", "ll", "la".
 int preprocess(char* rcmd)
 {
 	if (rcmd == nullptr) return 1;
 
 	char *p = rcmd;
-	char *newcmd = (char*)malloc(sizeof(char) * 1000);
+	char *newcmd = (char*)malloc(sizeof(char) * MAXN_CMD);
 	int n = 0;
 	while(p && *p && isspace(*p)) ++p;
 	
@@ -29,13 +31,13 @@ int preprocess(char* rcmd)
 	{
 		int i = 2;
 		while(isspace(p[i])) ++i;
-		getcwd(newcmd, sizeof(char) * 1000);
+		if (getcwd(newcmd, sizeof(char) * MAXN_CMD) == nullptr) { fprintf(stderr, "Cannot get current working directory.\n"); }
 		int tmp = strlen(newcmd);
 		newcmd[tmp] = '/';
 		newcmd[tmp + 1] = 0;
 		strcat(newcmd, p + i);
 		//printf("to dir : %s\n", newcmd);
-		chdir(newcmd);
+		if (chdir(newcmd) == -1) { fprintf(stderr, "Cannot get change directory.\n"); }
 		return 1;
 	}
 	
@@ -87,7 +89,7 @@ void execute(char** cmds, int n)
 	for (exeidx = n - 1; exeidx; --exeidx)
 	{
 		//printf("exeidx = %d\n", exeidx);
-		pipe(fd);
+		if (pipe(fd) < 0) { fprintf(stderr, "pipeline error\n"); }
 		pid = fork();
 		if (pid > 0)
 		{
@@ -116,8 +118,9 @@ void execute(char** cmds, int n)
 	//printf("to exec: %s\n", cmd);
 	
 	// deal with the redirection first
-	char *src  = (char*)malloc(sizeof(char) * 100);
-	char *dest = (char*)malloc(sizeof(char) * 100);
+    constexpr size_t MAXN_FNAME = 100;
+	char *src  = (char*)malloc(sizeof(char) * MAXN_FNAME);
+	char *dest = (char*)malloc(sizeof(char) * MAXN_FNAME);
 
 	// the redirection part of the command will be cover with ' '
 	// e.g. "cat filein > fileout" -> "cat filein         "
@@ -127,7 +130,8 @@ void execute(char** cmds, int n)
 	//printf("after erase the redirection section: %s", cmd);
 
 	// deal with the argument
-	char **argv = (char**)calloc(100, sizeof(char*));
+    constexpr size_t MAXN_ARG = 100;
+	char **argv = (char**)calloc(MAXN_ARG, sizeof(char*));
 	int p = 0, argc = 0;
 	while(isspace(cmd[p])) ++p;
 	while(cmd[p] && ~split(cmd + p, ' ', buf))
@@ -166,7 +170,7 @@ void execute(char** cmds, int n)
 	*/
 
 	if (execvp(argv[0], argv) < 0)
-		puts("myshell: Command not found");
+		puts("Pack: Command not found");
 
 	// release memory
 	for (int i = 0; i < argc; ++i)	free(argv[i]);
@@ -179,11 +183,17 @@ void execute(char** cmds, int n)
 
 int main()
 {
-	raw_command = (char*)malloc(sizeof(char) * 1000);
+    char * const inp = (char*)malloc(sizeof(char) * 50);
+    char * const cwd = (char*)malloc(sizeof(char) * MAXN_CMD);
+	raw_command = (char*)malloc(sizeof(char) * MAXN_CMD);
 	while(true)
 	{
+        if (getcwd(cwd, sizeof(char) * MAXN_CMD) == nullptr) { fprintf(stderr, "Cannot get current working directory.\n"); continue; }
+        fprintf(stdout, "%s", cwd);
 		fprintf(stdout, "$ ");
-		if (scanf("%1000[^\n]s", raw_command) == -1) break;
+        if (sprintf(inp, " %d[^\n]s", MAXN_CMD) < 0) { fprintf(stderr, "Cannot generate input pattern.\nTry to re-generate..."); continue; };
+        inp[0] = '%';
+		if (scanf(inp, raw_command) == -1) break;
 		if (strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0) break;
 		getchar();
 
