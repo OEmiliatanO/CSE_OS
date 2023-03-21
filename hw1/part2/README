@@ -1,0 +1,17 @@
+before using Pack shell, install GNU readline.
+
+```
+sudo apt install libreadline8 libreadline8-dev
+```
+
+then, make Pack.elf
+
+```
+make dep all clean
+```
+
+now you have Pack as your wingman!
+
+```
+/.Pack.elf
+```
