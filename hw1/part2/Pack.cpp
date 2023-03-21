@@ -9,7 +9,9 @@
 #include <fcntl.h>
 #include "parser.h"
 
-char* raw_command;
+// GNU readline library
+#include <readline/readline.h>
+#include <readline/history.h>
 
 int cmdcnt;
 char** cmds;
@@ -181,32 +183,26 @@ void execute(char** cmds, int n)
 	exit(0);
 }
 
-char * gen_inp_pattern()
+char* prompt(char * const prompt_s, char * const cwd, char const * const prompt_sign)
 {
-    char * inp = (char*)malloc(sizeof(char) * 50);
-    while (sprintf(inp, " %d[^\n]s", MAXN_CMD) < 0) { fprintf(stderr, "Cannot generate input pattern.\nTry to re-generate..."); }
-    inp[0] = '%';
+    sprintf(prompt_s, "%s %s ", cwd, prompt_sign);
+    char * inp = readline(prompt_s);
+    if (strcmp(inp, "") == 0) return inp;
+    add_history(inp);
     return inp;
-}
-
-void prompt(char * const cwd, char const * const prompt_word)
-{
-    fprintf(stdout, "%s", cwd);
-    fprintf(stdout, " %s ", prompt_word);
 }
 
 int main()
 {
-    char * const inp = gen_inp_pattern();
+    char * const prompt_s = (char *)malloc(sizeof(char) * MAXN_CMD);
     char * const cwd = (char*)malloc(sizeof(char) * MAXN_CMD);
     char prompt_word[] = "$>";
-	raw_command = (char*)malloc(sizeof(char) * MAXN_CMD);
 	while(true)
 	{
         if (getcwd(cwd, sizeof(char) * MAXN_CMD) == nullptr) { fprintf(stderr, "Cannot get current working directory.\n"); continue; }
-        prompt(cwd, prompt_word);
-		int scan_res = scanf(inp, raw_command); getchar();
-		if (strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0 || scan_res == -1) break;
+        char * raw_command = prompt(prompt_s, cwd, prompt_word);
+		if (raw_command == nullptr || strcmp(raw_command, "exit") == 0 || strcmp(raw_command, "quit") == 0) break;
+        if (strcmp(raw_command, "") == 0) continue;
 
 		if (preprocess(raw_command)) continue;
 		//printf("after proess : %s\n", raw_command);
@@ -226,8 +222,8 @@ int main()
 		for (int i = 0; i < cmdcnt; ++i)
 			free(cmds[i]);
 		free(cmds);
+        free(raw_command);
 	}
 	putchar('\n');
-	free(raw_command);
 	return 0;
 }
