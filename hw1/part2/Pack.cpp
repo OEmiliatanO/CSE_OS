@@ -41,7 +41,7 @@ int preprocess(char* rcmd)
 		strcat(newcmd, p + i);
 		//printf("to dir : %s\n", newcmd);
 		if (chdir(newcmd) == -1) { fprintf(stderr, "Cannot get change directory.\n"); }
-		return 1;
+	 	return 1;
 	}
 	
 	// ll, la, lA
@@ -133,7 +133,7 @@ void execute(char** cmds, int n)
 	//fprintf(stderr, "after erase the redirection section: %s\n", cmd);
 	if (getRedirFile(cmd, '>', dest, &isappend) <= 0) { free(dest); dest = nullptr; }
 
-	//fprintf(stderr, "after erase the redirection section: %s\n", cmd);
+	//fprintf(stderr, "after erase the redirection section: %s\n", cmd);//
 
 	// deal with the argument
 	char **argv = (char**)calloc(MAXN_ARG, sizeof(char*));
