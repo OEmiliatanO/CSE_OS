@@ -22,9 +22,11 @@ int split(char *src, char sp, char *des)
 	return sscanf(src, format, des);
 }
 
-int getRedirFile(char *src, char sp, char *des)
+int getRedirFile(char *src, char sp, char *des, int *isappend)
 {
 	char* p = strchr(src, sp);
+	if (p && sp == '>' && *(p+1) == '>') { *isappend = 1; *(p++) = ' ';}
+	else *isappend = 0;
 	
 	if (p) *(p++) = ' ';
 	else return 0;

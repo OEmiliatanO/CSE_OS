@@ -15,7 +15,7 @@ int split(char *src, char sp, char *des);
 
 int strip(char *src, char *des);
 
-int getRedirFile(char *src, char sp, char *des);
+int getRedirFile(char *src, char sp, char *des, int *isappend);
 
 char** cmdpar(char *raw_command, int& num);
 

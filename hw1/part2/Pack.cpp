@@ -127,10 +127,13 @@ void execute(char** cmds, int n)
 
 	// the redirection part of the command will be cover with ' '
 	// e.g. "cat filein > fileout" -> "cat filein         "
-	if (getRedirFile(cmd, '<', src) <= 0 ) { free(src);  src  = nullptr; }
-	if (getRedirFile(cmd, '>', dest) <= 0) { free(dest); dest = nullptr; }
+	int isappend = 0;
+	//fprintf(stderr, "erase...\n");
+	if (getRedirFile(cmd, '<', src, &isappend) <= 0 ) { free(src);  src  = nullptr; }
+	//fprintf(stderr, "after erase the redirection section: %s\n", cmd);
+	if (getRedirFile(cmd, '>', dest, &isappend) <= 0) { free(dest); dest = nullptr; }
 
-	//printf("after erase the redirection section: %s", cmd);
+	//fprintf(stderr, "after erase the redirection section: %s\n", cmd);
 
 	// deal with the argument
 	char **argv = (char**)calloc(MAXN_ARG, sizeof(char*));
@@ -159,7 +162,11 @@ void execute(char** cmds, int n)
 	if (dest != nullptr)
 	{
 		//printf("dest = %s\n", dest);
-		FILE *out = fopen(dest, "w");
+		FILE *out = NULL;
+		if (isappend)
+			out = fopen(dest, "a");
+		else
+			out = fopen(dest, "w");
 		dup2(fileno(out), STDOUT_FILENO);
 	}
 	/*
